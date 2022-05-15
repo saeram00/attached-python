@@ -1,7 +1,7 @@
 from itertools import count
 from typing import List
 
-# import csv
+import csv
 
 
 def answer_inp() -> List[int]:
@@ -9,7 +9,7 @@ def answer_inp() -> List[int]:
     answ = None
     q_num = count(start=1, step=1)
     print("Enter the patient's answers:")
-    while len(answers_lst) < 40:
+    while len(answers_lst) < 15: # Set to 40 when merging into main
         try:
             answ = input(f"{next(q_num)}) ")
             answers_lst.append(int(answ))
@@ -23,11 +23,10 @@ def answer_inp() -> List[int]:
 
 
 def create_file(f_name: str, answ_list: List[int]):
-    with open(f"{f_name}.csv", "w", encoding="utf-8", newline='') as patient:
-        # csv_writer = csv.writer(patient, dialect='excel')
-        for i, answ in enumerate(answ_list, start=1):
-          # csv_writer.write(f"{i}{answ}")
-            patient.write(f"{i},{answ}\n")
+    with open(f"{f_name}.csv", "w", encoding="utf-8", newline="") as patient:
+        csv_writer = csv.writer(patient, dialect="excel")
+        for item in tuple(enumerate(answ_list, start=1)):
+            csv_writer.writerow(item)
 
 
 def main():
