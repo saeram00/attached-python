@@ -1,6 +1,8 @@
 from itertools import count
 from typing import List
 
+# import csv
+
 
 def answer_inp() -> List[int]:
     answers_lst: List[int] = list()
@@ -22,7 +24,9 @@ def answer_inp() -> List[int]:
 
 def create_file(f_name: str, answ_list: List[int]):
     with open(f"{f_name}.csv", "w", encoding="utf-8", newline='') as patient:
+        # csv_writer = csv.writer(patient, dialect='excel')
         for i, answ in enumerate(answ_list, start=1):
+          # csv_writer.write(f"{i}{answ}")
             patient.write(f"{i},{answ}\n")
 
 
