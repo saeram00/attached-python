@@ -1,7 +1,8 @@
 from itertools import count
-from typing import List
+from typing import List, Tuple
 
 import csv
+import json
 
 
 def answer_inp() -> List[int]:
@@ -23,10 +24,21 @@ def answer_inp() -> List[int]:
 
 
 def create_file(f_name: str, answ_list: List[int]):
+    with open("item_factors.json") as jsonfile:
+        i_factors = json.load(jsonfile)["factors"]
+
     with open(f"{f_name}.csv", "w", encoding="utf-8", newline="") as patient:
-        csv_writer = csv.writer(patient, dialect="excel")
-        for item in tuple(enumerate(answ_list, start=1)):
-            csv_writer.writerow(item)
+        fieldnames: Tuple[str, ...] = ("item_factor", "question_number", "answer")
+        field_dict = dict().fromkeys(fieldnames)
+        csv_writer = csv.DictWriter(patient, fieldnames=fieldnames, dialect="excel")
+        csv_writer.writeheader()
+        for index in range(len(answ_list)):
+            for factor, q_nums in i_factors.items():
+                if index+1 in q_nums:
+                    field_dict["item_factor"] = factor
+                    field_dict["question_number"] = index+1
+                    field_dict["answer"] = answ_list[index]
+                    csv_writer.writerow(field_dict)
 
 
 def main():
@@ -37,6 +49,6 @@ def main():
     create_file(p_name, answer_inp())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
 
