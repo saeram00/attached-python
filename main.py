@@ -1,5 +1,5 @@
 from itertools import count
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 
 import csv
 import json
@@ -10,7 +10,7 @@ def answer_inp() -> List[int]:
     answ = None
     q_num = count(start=1, step=1)
     print("Enter the patient's answers:")
-    while len(answers_lst) < 15: # Set to 40 when merging into main
+    while len(answers_lst) < 40:
         try:
             answ = input(f"{next(q_num)}) ")
             answers_lst.append(int(answ))
@@ -28,15 +28,16 @@ def create_file(f_name: str, answ_list: List[int]):
         i_factors = json.load(jsonfile)["factors"]
 
     with open(f"{f_name}.csv", "w", encoding="utf-8", newline="") as patient:
-        fieldnames: Tuple[str, ...] = ("item_factor", "question_number", "answer")
-        field_dict = dict().fromkeys(fieldnames)
+        fieldnames: Tuple[str, ...] = ("question_number", "item_factor", "answer")
+        field_dict: Dict = dict().fromkeys(fieldnames)
         csv_writer = csv.DictWriter(patient, fieldnames=fieldnames, dialect="excel")
         csv_writer.writeheader()
+
         for index in range(len(answ_list)):
             for factor, q_nums in i_factors.items():
                 if index+1 in q_nums:
-                    field_dict["item_factor"] = factor
                     field_dict["question_number"] = index+1
+                    field_dict["item_factor"] = factor
                     field_dict["answer"] = answ_list[index]
                     csv_writer.writerow(field_dict)
 
