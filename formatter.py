@@ -20,19 +20,19 @@ class AnswerFormatter(csv.DictWriter):
         with open("item_factors.json") as jsonfile:
             self.__i_factors = json.load(jsonfile)["factors"]
 
-    def write_answers(self, answ_list: list[int]) -> None:
-        field_dict: dict = dict().fromkeys(self.fieldnames)
+    def write_answers(self, answers: list[int]) -> None:
+        fields: dict = dict().fromkeys(self.fieldnames)
         self.writeheader()
 
-        for index, answer in enumerate(answ_list, start=1):
-            for factor, q_nums in self.__i_factors.items():
-                if index in q_nums:
-                    field_dict.update({
+        for index, answer in enumerate(answers, start=1):
+            for factor, question_numbers in self.__i_factors.items():
+                if index in question_numbers:
+                    fields.update({
                         "question_number": index,
                         "item_factor": factor,
                         "answer": answer
                     })
-                    self.writerow(field_dict)
+                    self.writerow(fields)
 
 
 class ScoreCalculator(csv.DictReader):
@@ -50,16 +50,16 @@ class ScoreCalculator(csv.DictReader):
 
 
 def answer_input() -> list[int]:
-    answers_list: list[int] = []
+    answers: list[int] = []
     q_num: int = 1
     print("Enter the user's answers (number between 1-6):")
-    while len(answers_list) < 40:
+    while len(answers) < 40:
         try:
             answer: int = int(input(f"{q_num}) "))
             if not 1 <= answer <= 6:
                 raise ValueError
-            answers_list.append(answer)
+            answers.append(answer)
             q_num += 1
         except ValueError:
             print("Must input a number between 1-6:")
-    return answers_list
+    return answers

@@ -5,8 +5,10 @@ import formatter as ft
 
 
 def main() -> int:
-    user_name: str = sys.argv[1] if len(sys.argv) >= 2 else input(
-        "Name of the user (enter 'q' to quit): "
+    if len(sys.argv) > 2:
+        sys.exit("Must invoke with 0 or 1 arguments [user_name].")
+    user_name: str = sys.argv[1] if len(sys.argv) == 2 else input(
+        "Enter the name of the user (enter 'q' to quit): "
     )
     while not user_name.isalpha():
         print("Must enter a name:")
