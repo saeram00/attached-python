@@ -1,20 +1,30 @@
 import csv
 import json
 
+from pathlib import Path
 
-DFLT_FIELDNAMES: tuple[str, ...] = ("question_number", "item_factor", "answer")
+FACTORS_FILE: Path = Path("item_factors.json")
+FIELDNAMES: tuple[str, ...] = ("question_number", "item_factor", "answer")
 
 
 class AnswerFormatter(csv.DictWriter):
     """
     Custom class meant to join json reading and csv writing operations in a
     single object.
+
+    Attributes:
+    scores_file: FileObject: a file to write the scores to in csv format.
+    fieldnames: Iterable[str]: an iteralble of strings containing the names of
+    the fields for each csv column.
+    dialect: str: the csv dialect to write in. Defaults to excel.
+    __i_factors: dict[str, list]: the attachment factors extracted from a json
+    file to determine the item factor of each test question.
     """
 
-    def __init__(self, file, fieldnames=DFLT_FIELDNAMES, dialect="excel"):
-        super().__init__(file, fieldnames=fieldnames, dialect=dialect)
-        with open("item_factors.json") as jsonfile:
-            self.__i_factors = json.load(jsonfile)["factors"]
+    def __init__(self, scores_file, fieldnames=FIELDNAMES, dialect="excel"):
+        super().__init__(scores_file, fieldnames=fieldnames, dialect=dialect)
+        with open(FACTORS_FILE) as factors:
+            self.__i_factors = json.load(factors)["factors"]
 
     def write_answers(self, answers: list[int]) -> None:
         fields: dict = dict().fromkeys(self.fieldnames)
@@ -33,6 +43,31 @@ class AnswerFormatter(csv.DictWriter):
                     self.writerow(fields)
 
 
+class ScoreCalculator(object):
+    """
+    A class meant to calculate the sum of the scores obtained in the test and
+    detect the attachment style given the results.
+
+    Attributes:
+    scores_file: FileObject: a file where the test scores are stored in csv
+    format.
+    dialect: str: the csv dialect to pass to the reader. Defaults to excel.
+    __i_factors: dict[str, list]: the attachment factors extracted from a json
+    file to determine the item factor of each test question.
+    """
+
+    def __init__(self, scores_file, dialect="excel"):
+        self.__score_reader = csv.DictReader(scores_file, dialect=dialect)
+        with open(FACTORS_FILE) as factors:
+            self.__i_factors = json.load(factors)["factors"]
+
+    def compute_results(self) -> dict:
+        results: dict = dict.fromkeys(self.__i_factors.keys(), 0)
+        for score in self.__score_reader:
+            results[score[FIELDNAMES[1]]] += int(score[FIELDNAMES[2]])
+        return results
+
+
 def answer_input() -> list[int]:
     answers: list[int] = []
     q_num: int = 1
@@ -47,17 +82,3 @@ def answer_input() -> list[int]:
         except ValueError:
             print("Must input a number between 1-6:")
     return answers
-
-
-def compute_results(file: str) -> dict:
-    results: dict = {
-        "low_selfesteem": 0,
-        "conflict_resolution": 0,
-        "expressiveness": 0,
-        "self_sufficiency": 0,
-    }
-    with open(file, "r", encoding="utf-8", newline="") as user_file:
-        scores = csv.DictReader(user_file, dialect="excel")
-        for score in scores:
-            results[score["item_factor"]] += int(score["answer"])
-    return results

@@ -16,12 +16,15 @@ def main() -> int:
         print("Must enter a name:")
         user_name = input("> ")
     if user_name == "q":
-        sys.exit("Shutting down...")
+        print("Shutting down...")
+        sys.exit(2)
     with open(f"{user_name}.csv", "w", encoding="utf-8", newline="") as new_f:
         t_formatter = ft.AnswerFormatter(new_f)
         t_formatter.write_answers(ft.answer_input())
-    results: dict = ft.compute_results(f"{user_name}.csv")
-    print(results)
+    with open(f"{user_name}.csv", "r", encoding="utf-8", newline="") as scores:
+        score_calc = ft.ScoreCalculator(scores)
+        results: dict = score_calc.compute_results()
+        print(results)
     sys.exit(0)
 
 
