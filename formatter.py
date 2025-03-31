@@ -35,9 +35,9 @@ class AnswerFormatter(csv.DictWriter):
                 if index in question_numbers:
                     fields.update(
                         {
-                            "question_number": index,
-                            "item_factor": factor,
-                            "answer": answer,
+                            FIELDNAMES[0]: index,
+                            FIELDNAMES[1]: factor,
+                            FIELDNAMES[2]: answer,
                         }
                     )
                     self.writerow(fields)
