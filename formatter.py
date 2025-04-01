@@ -13,7 +13,7 @@ class AnswerFormatter(csv.DictWriter):
     single object.
 
     Attributes:
-    scores_file: FileObject: a file to write the scores to in csv format.
+    scores_file: TextIOWrapper: a file to write the scores to in csv format.
     fieldnames: Iterable[str]: an iteralble of strings containing the names of
     the fields for each csv column.
     dialect: str: the csv dialect to write in. Defaults to excel.
@@ -49,7 +49,7 @@ class ScoreCalculator(object):
     detect the attachment style given the results.
 
     Attributes:
-    scores_file: FileObject: a file where the test scores are stored in csv
+    scores_file: TextIOWrapper: a file where the test scores are stored in csv
     format.
     dialect: str: the csv dialect to pass to the reader. Defaults to excel.
     __i_factors: dict[str, list]: the attachment factors extracted from a json
