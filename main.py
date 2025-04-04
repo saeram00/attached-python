@@ -1,7 +1,11 @@
 #!/usr/bin/env python3
 import sys
 
-import formatter as ft
+from pathlib import Path
+
+import attached.attached as at
+
+SCRIPT_ROOT = Path(__file__).parent
 
 
 def main() -> int:
@@ -18,11 +22,14 @@ def main() -> int:
     if user_name == "q":
         print("Shutting down...")
         sys.exit(2)
-    with open(f"{user_name}.csv", "w", encoding="utf-8", newline="") as new_f:
-        t_formatter = ft.AnswerFormatter(new_f)
-        t_formatter.write_answers(ft.answer_input())
-    with open(f"{user_name}.csv", "r", encoding="utf-8", newline="") as scores:
-        score_calc = ft.ScoreCalculator(scores)
+    SCRIPT_ROOT.joinpath("user_scores").mkdir(exist_ok=True)
+    SCORES_DIR = SCRIPT_ROOT.joinpath("user_scores")
+    user_answers = SCORES_DIR.joinpath(f"{user_name}.csv")
+    with open(user_answers, "w", encoding="utf-8", newline="") as answers:
+        a_formatter = at.AnswerFormatter(answers)
+        a_formatter.write_answers(at.answer_input())
+    with open(user_answers, "r", encoding="utf-8", newline="") as scores:
+        score_calc = at.ScoreCalculator(scores)
         results: dict = score_calc.compute_results()
         print(results)
     sys.exit(0)
